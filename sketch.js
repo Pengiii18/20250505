@@ -5,6 +5,10 @@ let video;
 let handPose;
 let hands = [];
 
+let circleX = 320; // Initial x position of the circle
+let circleY = 240; // Initial y position of the circle
+const circleSize = 100; // Diameter of the circle
+
 function preload() {
   // Initialize HandPose model with flipped video input
   handPose = ml5.handPose({ flipped: true });
@@ -30,10 +34,24 @@ function setup() {
 function draw() {
   image(video, 0, 0);
 
+  // Draw the circle
+  fill(0, 255, 0, 150);
+  noStroke();
+  circle(circleX, circleY, circleSize);
+
   // Ensure at least one hand is detected
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
+        // Check if index finger (keypoint 8) is touching the circle
+        let indexFinger = hand.keypoints[8];
+        let d = dist(indexFinger.x, indexFinger.y, circleX, circleY);
+        if (d < circleSize / 2) {
+          // Move the circle to follow the index finger
+          circleX = indexFinger.x;
+          circleY = indexFinger.y;
+        }
+
         // Draw lines connecting keypoints 0 to 4
         if (hand.keypoints.length > 4) {
           stroke(hand.handedness == "Left" ? color(255, 0, 255) : color(255, 255, 0));
