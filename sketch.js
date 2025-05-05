@@ -82,14 +82,14 @@ function draw() {
           circleX = thumb.x;
           circleY = thumb.y;
 
-          // Start drawing the trajectory for the thumb
+          // Add the current position to the thumb trajectory
           trajectory.push({ x: thumb.x, y: thumb.y });
         } else if (dIndex < circleSize / 2) {
           // Move the circle to follow the index finger
           circleX = indexFinger.x;
           circleY = indexFinger.y;
 
-          // Start drawing the trajectory for the index finger
+          // Add the current position to the index finger trajectory
           indexTrajectory.push({ x: indexFinger.x, y: indexFinger.y });
         }
 
