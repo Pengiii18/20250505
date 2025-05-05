@@ -42,7 +42,7 @@ function draw() {
   circle(circleX, circleY, circleSize);
 
   // Draw the trajectory
-  stroke(255, 0, 0);
+  stroke(0, 0, 255); // Set trajectory color to blue
   strokeWeight(2);
   noFill();
   beginShape();
@@ -55,16 +55,16 @@ function draw() {
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
-        // Check if index finger (keypoint 8) is touching the circle
-        let indexFinger = hand.keypoints[8];
-        let d = dist(indexFinger.x, indexFinger.y, circleX, circleY);
+        // Check if thumb (keypoint 1) is touching the circle
+        let thumb = hand.keypoints[1];
+        let d = dist(thumb.x, thumb.y, circleX, circleY);
         if (d < circleSize / 2) {
-          // Move the circle to follow the index finger
-          circleX = indexFinger.x;
-          circleY = indexFinger.y;
+          // Move the circle to follow the thumb
+          circleX = thumb.x;
+          circleY = thumb.y;
 
           // Add the current position to the trajectory
-          trajectory.push({ x: indexFinger.x, y: indexFinger.y });
+          trajectory.push({ x: thumb.x, y: thumb.y });
         }
 
         // Draw lines connecting keypoints 0 to 4
