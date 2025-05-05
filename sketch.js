@@ -9,6 +9,9 @@ let circleX = 320; // Initial x position of the circle
 let circleY = 240; // Initial y position of the circle
 const circleSize = 100; // Diameter of the circle
 
+let trajectory = []; // Array to store the trajectory points
+let isDrawing = false; // Flag to track if the thumb is inside the circle
+
 function preload() {
   // Initialize HandPose model with flipped video input
   handPose = ml5.handPose({ flipped: true });
@@ -39,17 +42,39 @@ function draw() {
   noStroke();
   circle(circleX, circleY, circleSize);
 
+  // Draw the trajectory
+  stroke(0, 0, 255); // Set trajectory color to blue
+  strokeWeight(2);
+  noFill();
+  beginShape();
+  for (let point of trajectory) {
+    vertex(point.x, point.y);
+  }
+  endShape();
+
   // Ensure at least one hand is detected
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
-        // Check if index finger (keypoint 8) is touching the circle
-        let indexFinger = hand.keypoints[8];
-        let d = dist(indexFinger.x, indexFinger.y, circleX, circleY);
+        // Get the position of the thumb (keypoint 4)
+        let thumb = hand.keypoints[4];
+
+        // Calculate the distance between the thumb and the circle
+        let d = dist(thumb.x, thumb.y, circleX, circleY);
+
         if (d < circleSize / 2) {
-          // Move the circle to follow the index finger
-          circleX = indexFinger.x;
-          circleY = indexFinger.y;
+          // Move the circle to follow the thumb
+          circleX = thumb.x;
+          circleY = thumb.y;
+
+          // Start drawing the trajectory
+          if (!isDrawing) {
+            isDrawing = true;
+          }
+          trajectory.push({ x: thumb.x, y: thumb.y });
+        } else {
+          // Stop drawing when the thumb leaves the circle
+          isDrawing = false;
         }
 
         // Draw lines connecting keypoints 0 to 4
