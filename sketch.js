@@ -9,8 +9,7 @@ let circleX = 320; // Initial x position of the circle
 let circleY = 240; // Initial y position of the circle
 const circleSize = 100; // Diameter of the circle
 
-let isDrawing = false; // Flag to track if the finger is inside the circle
-let prevX, prevY; // Previous position of the finger
+let trajectory = []; // Array to store the trajectory points
 
 function preload() {
   // Initialize HandPose model with flipped video input
@@ -42,6 +41,16 @@ function draw() {
   noStroke();
   circle(circleX, circleY, circleSize);
 
+  // Draw the trajectory
+  stroke(255, 0, 0);
+  strokeWeight(2);
+  noFill();
+  beginShape();
+  for (let point of trajectory) {
+    vertex(point.x, point.y);
+  }
+  endShape();
+
   // Ensure at least one hand is detected
   if (hands.length > 0) {
     for (let hand of hands) {
@@ -54,22 +63,8 @@ function draw() {
           circleX = indexFinger.x;
           circleY = indexFinger.y;
 
-          // Start drawing the trajectory
-          if (!isDrawing) {
-            isDrawing = true;
-            prevX = indexFinger.x;
-            prevY = indexFinger.y;
-          } else {
-            // Draw a red line from the previous position to the current position
-            stroke(255, 0, 0);
-            strokeWeight(2);
-            line(prevX, prevY, indexFinger.x, indexFinger.y);
-            prevX = indexFinger.x;
-            prevY = indexFinger.y;
-          }
-        } else {
-          // Stop drawing when the finger leaves the circle
-          isDrawing = false;
+          // Add the current position to the trajectory
+          trajectory.push({ x: indexFinger.x, y: indexFinger.y });
         }
 
         // Draw lines connecting keypoints 0 to 4
