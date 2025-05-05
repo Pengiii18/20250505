@@ -56,25 +56,25 @@ function draw() {
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
-        // Check if index finger (keypoint 8) is touching the circle
+        // Get positions of index finger and thumb
         let indexFinger = hand.keypoints[8];
         let thumb = hand.keypoints[4];
 
+        // Calculate distances to the circle
         let dIndex = dist(indexFinger.x, indexFinger.y, circleX, circleY);
         let dThumb = dist(thumb.x, thumb.y, circleX, circleY);
 
+        // Check if either finger is touching the circle
         if (dIndex < circleSize / 2) {
-          // Switch to index finger control
-          activeFinger = 8;
-          circleX = indexFinger.x;
-          circleY = indexFinger.y;
-          trajectory.push({ x: indexFinger.x, y: indexFinger.y });
+          activeFinger = 8; // Set active finger to index finger
+          circleX = indexFinger.position.x;
+          circleY = indexFinger.position.y;
+          trajectory.push({ x: indexFinger.position.x, y: indexFinger.position.y });
         } else if (dThumb < circleSize / 2) {
-          // Switch to thumb control
-          activeFinger = 4;
-          circleX = thumb.x;
-          circleY = thumb.y;
-          trajectory.push({ x: thumb.x, y: thumb.y });
+          activeFinger = 4; // Set active finger to thumb
+          circleX = thumb.position.x;
+          circleY = thumb.position.y;
+          trajectory.push({ x: thumb.position.x, y: thumb.position.y });
         }
 
         // Draw lines connecting keypoints 0 to 4
