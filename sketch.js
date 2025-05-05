@@ -9,6 +9,9 @@ let circleX = 320; // Initial x position of the circle
 let circleY = 240; // Initial y position of the circle
 const circleSize = 100; // Diameter of the circle
 
+let isDrawing = false; // Flag to track if the finger is inside the circle
+let prevX, prevY; // Previous position of the finger
+
 function preload() {
   // Initialize HandPose model with flipped video input
   handPose = ml5.handPose({ flipped: true });
@@ -50,6 +53,23 @@ function draw() {
           // Move the circle to follow the index finger
           circleX = indexFinger.x;
           circleY = indexFinger.y;
+
+          // Start drawing the trajectory
+          if (!isDrawing) {
+            isDrawing = true;
+            prevX = indexFinger.x;
+            prevY = indexFinger.y;
+          } else {
+            // Draw a red line from the previous position to the current position
+            stroke(255, 0, 0);
+            strokeWeight(2);
+            line(prevX, prevY, indexFinger.x, indexFinger.y);
+            prevX = indexFinger.x;
+            prevY = indexFinger.y;
+          }
+        } else {
+          // Stop drawing when the finger leaves the circle
+          isDrawing = false;
         }
 
         // Draw lines connecting keypoints 0 to 4
