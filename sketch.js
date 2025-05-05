@@ -9,7 +9,8 @@ let circleX = 320; // Initial x position of the circle
 let circleY = 240; // Initial y position of the circle
 const circleSize = 100; // Diameter of the circle
 
-let trajectory = []; // Array to store the trajectory points
+let thumbTrajectory = []; // Array to store the trajectory points for the thumb
+let indexTrajectory = []; // Array to store the trajectory points for the index finger
 
 function preload() {
   // Initialize HandPose model with flipped video input
@@ -41,12 +42,22 @@ function draw() {
   noStroke();
   circle(circleX, circleY, circleSize);
 
-  // Draw the trajectory
-  stroke(255, 0, 0);
+  // Draw the trajectory for the thumb
+  stroke(0, 0, 255); // Blue for thumb
   strokeWeight(2);
   noFill();
   beginShape();
-  for (let point of trajectory) {
+  for (let point of thumbTrajectory) {
+    vertex(point.x, point.y);
+  }
+  endShape();
+
+  // Draw the trajectory for the index finger
+  stroke(255, 0, 0); // Red for index finger
+  strokeWeight(2);
+  noFill();
+  beginShape();
+  for (let point of indexTrajectory) {
     vertex(point.x, point.y);
   }
   endShape();
@@ -55,16 +66,28 @@ function draw() {
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
-        // Check if index finger (keypoint 8) is touching the circle
-        let indexFinger = hand.keypoints[8];
-        let d = dist(indexFinger.x, indexFinger.y, circleX, circleY);
-        if (d < circleSize / 2) {
+        // Get the position of the thumb (keypoint 4) and index finger (keypoint 8)
+        let thumb = hand.keypoints[4].position;
+        let indexFinger = hand.keypoints[8].position;
+
+        // Calculate the distance between the thumb and the circle
+        let dThumb = dist(thumb.x, thumb.y, circleX, circleY);
+        let dIndex = dist(indexFinger.x, indexFinger.y, circleX, circleY);
+
+        if (dThumb < circleSize / 2) {
+          // Move the circle to follow the thumb
+          circleX = thumb.x;
+          circleY = thumb.y;
+
+          // Add the current position to the thumb trajectory
+          thumbTrajectory.push({ x: thumb.x, y: thumb.y });
+        } else if (dIndex < circleSize / 2) {
           // Move the circle to follow the index finger
           circleX = indexFinger.x;
           circleY = indexFinger.y;
 
-          // Add the current position to the trajectory
-          trajectory.push({ x: indexFinger.x, y: indexFinger.y });
+          // Add the current position to the index finger trajectory
+          indexTrajectory.push({ x: indexFinger.x, y: indexFinger.y });
         }
 
         // Draw lines connecting keypoints 0 to 4
