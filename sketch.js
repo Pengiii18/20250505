@@ -62,6 +62,24 @@ function draw() {
             line(start.x, start.y, end.x, end.y);
           }
         }
+         // Draw lines connecting keypoints 9 to 12
+         if (hand.keypoints.length > 12) {
+          for (let i = 13; i < 16; i++) {
+            let start = hand.keypoints[i];
+            let end = hand.keypoints[i + 1];
+            line(start.x, start.y, end.x, end.y);
+          }
+        }
+         // Draw lines connecting keypoints 9 to 12
+         if (hand.keypoints.length > 12) {
+          for (let i = 17; i < 20; i++) {
+            let start = hand.keypoints[i];
+            let end = hand.keypoints[i + 1];
+            line(start.x, start.y, end.x, end.y);
+          }
+        }
+
+
 
         // Loop through keypoints and draw circles
         for (let i = 0; i < hand.keypoints.length; i++) {
