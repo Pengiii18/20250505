@@ -10,6 +10,7 @@ let circleY = 240; // Initial y position of the circle
 const circleSize = 100; // Diameter of the circle
 
 let trajectory = []; // Array to store the trajectory points
+let activeFinger = null; // Track the active finger controlling the circle
 
 function preload() {
   // Initialize HandPose model with flipped video input
@@ -42,7 +43,7 @@ function draw() {
   circle(circleX, circleY, circleSize);
 
   // Draw the trajectory
-  stroke(0, 0, 255); // Set trajectory color to blue
+  stroke(activeFinger === 8 ? 255 : 0, 0, activeFinger === 4 ? 255 : 0); // Red for index finger, blue for thumb
   strokeWeight(2);
   noFill();
   beginShape();
@@ -55,15 +56,24 @@ function draw() {
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
-        // Check if thumb (keypoint 1) is touching the circle
-        let thumb = hand.keypoints[1];
-        let d = dist(thumb.x, thumb.y, circleX, circleY);
-        if (d < circleSize / 2) {
-          // Move the circle to follow the thumb
+        // Check if index finger (keypoint 8) is touching the circle
+        let indexFinger = hand.keypoints[8];
+        let thumb = hand.keypoints[4];
+
+        let dIndex = dist(indexFinger.x, indexFinger.y, circleX, circleY);
+        let dThumb = dist(thumb.x, thumb.y, circleX, circleY);
+
+        if (dIndex < circleSize / 2) {
+          // Switch to index finger control
+          activeFinger = 8;
+          circleX = indexFinger.x;
+          circleY = indexFinger.y;
+          trajectory.push({ x: indexFinger.x, y: indexFinger.y });
+        } else if (dThumb < circleSize / 2) {
+          // Switch to thumb control
+          activeFinger = 4;
           circleX = thumb.x;
           circleY = thumb.y;
-
-          // Add the current position to the trajectory
           trajectory.push({ x: thumb.x, y: thumb.y });
         }
 
