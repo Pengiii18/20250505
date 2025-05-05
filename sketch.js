@@ -9,9 +9,6 @@ let circleX = 320; // Initial x position of the circle
 let circleY = 240; // Initial y position of the circle
 const circleSize = 100; // Diameter of the circle
 
-let trajectory = []; // Array to store the trajectory points
-let activeFinger = null; // Track the active finger controlling the circle
-
 function preload() {
   // Initialize HandPose model with flipped video input
   handPose = ml5.handPose({ flipped: true });
@@ -42,39 +39,17 @@ function draw() {
   noStroke();
   circle(circleX, circleY, circleSize);
 
-  // Draw the trajectory
-  stroke(activeFinger === 8 ? 255 : 0, 0, activeFinger === 4 ? 255 : 0); // Red for index finger, blue for thumb
-  strokeWeight(2);
-  noFill();
-  beginShape();
-  for (let point of trajectory) {
-    vertex(point.x, point.y);
-  }
-  endShape();
-
   // Ensure at least one hand is detected
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
-        // Get positions of index finger and thumb
-        let indexFinger = hand.keypoints[8].position;
-        let thumb = hand.keypoints[4].position;
-
-        // Calculate distances to the circle
-        let dIndex = dist(indexFinger.x, indexFinger.y, circleX, circleY);
-        let dThumb = dist(thumb.x, thumb.y, circleX, circleY);
-
-        // Check if either finger is touching the circle
-        if (dIndex < circleSize / 2) {
-          activeFinger = 8; // Set active finger to index finger
+        // Check if index finger (keypoint 8) is touching the circle
+        let indexFinger = hand.keypoints[8];
+        let d = dist(indexFinger.x, indexFinger.y, circleX, circleY);
+        if (d < circleSize / 2) {
+          // Move the circle to follow the index finger
           circleX = indexFinger.x;
           circleY = indexFinger.y;
-          trajectory.push({ x: indexFinger.x, y: indexFinger.y });
-        } else if (dThumb < circleSize / 2) {
-          activeFinger = 4; // Set active finger to thumb
-          circleX = thumb.x;
-          circleY = thumb.y;
-          trajectory.push({ x: thumb.x, y: thumb.y });
         }
 
         // Draw lines connecting keypoints 0 to 4
@@ -84,7 +59,7 @@ function draw() {
           for (let i = 0; i < 4; i++) {
             let start = hand.keypoints[i];
             let end = hand.keypoints[i + 1];
-            line(start.position.x, start.position.y, end.position.x, end.position.y);
+            line(start.x, start.y, end.x, end.y);
           }
         }
 
@@ -93,7 +68,7 @@ function draw() {
           for (let i = 5; i < 8; i++) {
             let start = hand.keypoints[i];
             let end = hand.keypoints[i + 1];
-            line(start.position.x, start.position.y, end.position.x, end.position.y);
+            line(start.x, start.y, end.x, end.y);
           }
         }
 
@@ -102,7 +77,7 @@ function draw() {
           for (let i = 9; i < 12; i++) {
             let start = hand.keypoints[i];
             let end = hand.keypoints[i + 1];
-            line(start.position.x, start.position.y, end.position.x, end.position.y);
+            line(start.x, start.y, end.x, end.y);
           }
         }
 
@@ -111,7 +86,7 @@ function draw() {
           for (let i = 13; i < 16; i++) {
             let start = hand.keypoints[i];
             let end = hand.keypoints[i + 1];
-            line(start.position.x, start.position.y, end.position.x, end.position.y);
+            line(start.x, start.y, end.x, end.y);
           }
         }
 
@@ -120,7 +95,7 @@ function draw() {
           for (let i = 17; i < 20; i++) {
             let start = hand.keypoints[i];
             let end = hand.keypoints[i + 1];
-            line(start.position.x, start.position.y, end.position.x, end.position.y);
+            line(start.x, start.y, end.x, end.y);
           }
         }
 
@@ -136,7 +111,7 @@ function draw() {
           }
 
           noStroke();
-          circle(keypoint.position.x, keypoint.position.y, 16);
+          circle(keypoint.x, keypoint.y, 16);
         }
       }
     }
