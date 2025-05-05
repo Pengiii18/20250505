@@ -57,8 +57,8 @@ function draw() {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
         // Get positions of index finger and thumb
-        let indexFinger = hand.keypoints[8];
-        let thumb = hand.keypoints[4];
+        let indexFinger = hand.keypoints[8].position;
+        let thumb = hand.keypoints[4].position;
 
         // Calculate distances to the circle
         let dIndex = dist(indexFinger.x, indexFinger.y, circleX, circleY);
@@ -67,14 +67,14 @@ function draw() {
         // Check if either finger is touching the circle
         if (dIndex < circleSize / 2) {
           activeFinger = 8; // Set active finger to index finger
-          circleX = indexFinger.position.x;
-          circleY = indexFinger.position.y;
-          trajectory.push({ x: indexFinger.position.x, y: indexFinger.position.y });
+          circleX = indexFinger.x;
+          circleY = indexFinger.y;
+          trajectory.push({ x: indexFinger.x, y: indexFinger.y });
         } else if (dThumb < circleSize / 2) {
           activeFinger = 4; // Set active finger to thumb
-          circleX = thumb.position.x;
-          circleY = thumb.position.y;
-          trajectory.push({ x: thumb.position.x, y: thumb.position.y });
+          circleX = thumb.x;
+          circleY = thumb.y;
+          trajectory.push({ x: thumb.x, y: thumb.y });
         }
 
         // Draw lines connecting keypoints 0 to 4
@@ -84,7 +84,7 @@ function draw() {
           for (let i = 0; i < 4; i++) {
             let start = hand.keypoints[i];
             let end = hand.keypoints[i + 1];
-            line(start.x, start.y, end.x, end.y);
+            line(start.position.x, start.position.y, end.position.x, end.position.y);
           }
         }
 
@@ -93,7 +93,7 @@ function draw() {
           for (let i = 5; i < 8; i++) {
             let start = hand.keypoints[i];
             let end = hand.keypoints[i + 1];
-            line(start.x, start.y, end.x, end.y);
+            line(start.position.x, start.position.y, end.position.x, end.position.y);
           }
         }
 
@@ -102,7 +102,7 @@ function draw() {
           for (let i = 9; i < 12; i++) {
             let start = hand.keypoints[i];
             let end = hand.keypoints[i + 1];
-            line(start.x, start.y, end.x, end.y);
+            line(start.position.x, start.position.y, end.position.x, end.position.y);
           }
         }
 
@@ -111,7 +111,7 @@ function draw() {
           for (let i = 13; i < 16; i++) {
             let start = hand.keypoints[i];
             let end = hand.keypoints[i + 1];
-            line(start.x, start.y, end.x, end.y);
+            line(start.position.x, start.position.y, end.position.x, end.position.y);
           }
         }
 
@@ -120,7 +120,7 @@ function draw() {
           for (let i = 17; i < 20; i++) {
             let start = hand.keypoints[i];
             let end = hand.keypoints[i + 1];
-            line(start.x, start.y, end.x, end.y);
+            line(start.position.x, start.position.y, end.position.x, end.position.y);
           }
         }
 
@@ -136,7 +136,7 @@ function draw() {
           }
 
           noStroke();
-          circle(keypoint.x, keypoint.y, 16);
+          circle(keypoint.position.x, keypoint.position.y, 16);
         }
       }
     }
